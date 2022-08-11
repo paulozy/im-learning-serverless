@@ -11,15 +11,22 @@ const serverlessConfiguration: AWS = {
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
+      binaryMediaTypes: ['*/*'],
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
+      bucketName: 'certificate-template-paulozy',
     },
     iamRoleStatements: [
       {
         Effect: 'Allow',
         Action: ["dynamodb:*"],
+        Resource: ["*"],
+      },
+      {
+        Effect: 'Allow',
+        Action: ["s3:*"],
         Resource: ["*"],
       }
     ]
@@ -62,7 +69,6 @@ const serverlessConfiguration: AWS = {
       define: { 'require.resolve': undefined },
       platform: 'node',
       concurrency: 10,
-      external: ["chrome-aws-lambda"],
     },
     dynamodb: {
       stages: ['dev', 'local'],
@@ -71,7 +77,8 @@ const serverlessConfiguration: AWS = {
         inMemory: true,
         migrate: true
       }
-    }
+    },
+    bucketName: 'certificate-template-paulozy',
   },
   resources: {
     Resources: {
@@ -95,6 +102,12 @@ const serverlessConfiguration: AWS = {
               KeyType: 'HASH',
             }
           ]
+        }
+      },
+      templateBucket: {
+        Type: 'AWS::S3::Bucket',
+        Properties: {
+          BucketName: 'certificate-template-paulozy',
         }
       }
     }
